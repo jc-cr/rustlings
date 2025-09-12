@@ -1,0 +1,62 @@
+# Apptainer Definition File for a robust Rust environment
+# Filename: rust.def
+
+Bootstrap: docker
+From: rust:1.87.0
+
+%help
+    This container provides a robust Rust 1.87.0 environment.
+    The default working directory is /app.
+    All common tool caches and data directories (Cargo, rustup, XDG) 
+    are redirected to subdirectories within /app to ensure writability.
+
+%post
+    # This section runs commands inside the container during the build process.
+    # We create the /app directory here, similar to what WORKDIR does.
+    echo "Creating /app directory..."
+    mkdir /app
+
+%environment
+    # Set the working directory for the container.
+    export APPTAINER_CWD=/app
+
+    # --- Rust-Specific Configuration ---
+    # Tell rustup to use a writable directory for toolchains and components.
+    export RUSTUP_HOME=/app/.rustup
+    # Tell Cargo to use a writable directory for its data.
+    export CARGO_HOME=/app/.cargo
+    # Add Cargo's bin directory to the PATH so we can run installed tools.
+    export PATH=$CARGO_HOME/bin:$PATH
+    # Set the build/target directory to be inside our writable mount to avoid `noexec` issues.
+    export CARGO_TARGET_DIR=/app/target
+
+    # --- General Tool Configuration (XDG Base Directory Specification) ---
+    # This prevents many other tools from failing due to read-only errors.
+    # For user-specific non-essential (cached) data.
+    export XDG_CACHE_HOME=/app/.cache
+    # For user-specific configuration files.
+    export XDG_CONFIG_HOME=/app/.config
+    # For user-specific data files.
+    export XDG_DATA_HOME=/app/.local/share
+    # For user-specific state files.
+    export XDG_STATE_HOME=/app/.local/state
+
+
+%runscript
+    # This script is executed when you run the container (e.g., `apptainer run my_rust_app.sif`).
+    # We change into the /app directory so you start there by default.
+    cd /app
+    echo "Entered Rust container. Current directory: $(pwd)"
+    echo "Use 'rustc --version' to check the Rust compiler version."
+    
+    # If arguments are passed to `apptainer run`, execute them.
+    # Otherwise, start a shell.
+    if [ $# -gt 0 ]; then
+        exec "$@"
+    else
+        exec /bin/bash
+    fi
+
+%labels
+    Author YourName
+    Version 1.4.0

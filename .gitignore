@@ -1,0 +1,21 @@
+# Apptainer/Singularity image files
+*.sif
+
+# Rust build artifacts and dependencies
+/target/
+.rustup/
+.cargo/
+
+# General cache, config, and data files created by the container
+/.cache/
+/.config/
+/.local/
+
+# Standard Rust ignores
+Cargo.lock
+
+# Editor-specific files
+.vscode/
+.idea/
+*.swp
+*.swo
