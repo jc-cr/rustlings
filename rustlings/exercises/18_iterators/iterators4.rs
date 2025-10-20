@@ -10,6 +10,15 @@ fn factorial(num: u64) -> u64 {
     // - additional variables
     // For an extra challenge, don't use:
     // - recursion
+
+    // Using iterative algo from wikipedia
+    // return a value f that is product of 1 up to 
+    // num. 
+    (1..=num).product()
+    // creates an inclusive range 1..n
+    // takes product of that
+    // for 0, product() returns multiplicative identity (1) of empty set
+    // https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.product
 }
 
 fn main() {
